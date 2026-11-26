@@ -1,0 +1,62 @@
+
+.kpis {grid-area:metrics} .picture {grid-area:picture} .queue-panel {grid-area:queue}
+.detail-panel {grid-area:details} .replay {grid-area:replay}
+
+.frame {grid-template-columns:minmax(0,1fr)}
+nav {margin-inline:22px; padding:14px 4px 8px; border-bottom:1px solid var(--line)}
+nav a {padding:7px 11px; border-bottom:2px solid var(--line)}
+.brand {margin-right:12px}
+.workspace {padding:22px}
+.topbar {grid-template-columns:.99fr max-content;align-items:center;padding:18px;background:var(--surface);border-radius:var(--radius)}
+h1 {font-size:clamp(26px,3vw,41px)}
+.sheet {grid-template-columns:minmax(0,1.1fr) minmax(0,.8fr) minmax(0,.66fr);grid-template-areas:"picture picture metrics" "picture picture replay" "queue queue details"}
+.kpis {grid-template-columns:repeat(2,minmax(0,1fr)); background:var(--surface);border:1px solid var(--line)}
+.kpi {border:1px solid var(--line)}
+.picture {padding:23px;align-self:stretch}
+.picture canvas {height:282px}
+@media(max-width:720px){.workspace{padding:11px}.topbar{grid-template-columns:1fr}.picture canvas{height:182px}}
+
+body {margin:0; background:var(--bg); color:var(--ink); font-family:var(--font-ui); font-size:14px; min-width:0; font-size:13px}
+.topbar h1 {letter-spacing:.035em}
+.topbar .context {color:#dec8df}
+.controls label {display:grid; gap:5px; min-width:76px; color:var(--muted); font-size:12px; font-weight:700}
+.controls .secondary {background:#3e3048;border-color:#856589}
+.filters input,.filters select {background:#241d2b;color:#e9d4ee;border-color:#795879}
+.picture canvas {border:1px solid #624869;border-radius:5px;background:#271e31}
+.panel-title h2 {font-weight:760}
+.panel-title span {padding:3px 7px;border:1px dashed #795979;font-size:11px}
+.kpi strong {font:750 clamp(19px,2.6vw,34px)/1 var(--font-num); font-variant-numeric:tabular-nums; font-family:var(--font-num);font-size:clamp(21px,2.2vw,28px);color:#eed2ea}
+.kpi:nth-child(4) {background:#412c4b}
+.kpi:nth-child(4) strong {color:#f4b8e3}
+.queue-panel th {font-size:11px;font-weight:760;color:#dac7de;background:#372940}
+.queue-panel tr:hover {background:#3f3046}
+.queue-panel td:nth-child(3),.queue-panel td:nth-child(4) {font-family:var(--font-num);text-align:right}
+.queue-panel th:nth-child(3),.queue-panel th:nth-child(4) {text-align:right}
+.tag-held,.tag-manual {color:var(--warning); background:#513345;border-color:#9d627d;color:#ffdd9e}
+.detail-panel {border-left:3px solid #cc8dbb}
+.replay {background:#281e30}
+.replay strong {color:#efb9dd}
+
+.appeal-exposure {margin:14px 0 3px;padding:11px 12px;background:#412d49;border:1px solid #765176}
+.appeal-exposure h3 {font-size:13px;font-weight:700;color:#fbdcfa;margin-bottom:9px}
+.appeal-exposure dl {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.appeal-exposure .scene-row {border-top:2px solid #a77aa1;background:#34263c;padding:7px 9px;min-width:0}
+.appeal-exposure .scene-row:first-child {background:#563b5c;border-top-color:#efb3de}
+.appeal-exposure dt {font-size:11px;color:#e5cce6}
+.appeal-exposure dd {margin:5px 0 0;font:650 clamp(13px,1.6vw,18px)/1.4 var(--font-num);color:#ffd8f3}
+@media(max-width:540px){.appeal-exposure dl{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.controls .action:first-of-type:hover:enabled {background:#fbc6e8}
+.controls .secondary:hover:enabled {background:#583f63}
+.picture .caption {color:#d0b1d2;letter-spacing:.02em}
+.detail-panel .panel-title {border-bottom:1px solid #71567a;padding-bottom:7px}
+.detail-panel .ticket-values dd {font-family:var(--font-num);color:#edd3ee}
+.detail-panel .decision-note {background:#4e354a;padding:7px;border:1px solid #7e5b69}
+.detail-panel details summary {color:#edb7e0}
+.queue-panel .row-button {font-weight:650;color:#f2dfef}
+.queue-panel .row-button:hover {color:#ffd0ec}
+.queue-panel .table-scroll th:nth-child(4) {border-right:1px solid #5d4367}
+.kpi:nth-child(2) {border-left-color:#976996}
+.replay #regimes li {border-top-color:#624d68}
+.statusbar {color:#c5afd1}
+@media(max-width:720px){.picture{padding:12px}.kpi:nth-child(4){padding-inline:10px}}
