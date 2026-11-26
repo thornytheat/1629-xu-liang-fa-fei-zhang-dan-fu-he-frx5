@@ -28,3 +28,6 @@
 | TRAP-44 | 稀疏或常量参考出现越界值时拦住自动分派 | `src/peakledger/meter_regimes/service.py` | `tests/test_meter_regimes.py::test_constant_distribution_detects_outside` |
 | TRAP-53 | 同批重排仍得到相同证据和决策 | `src/peakledger/invoice_reconcile/service.py` | `tests/test_invoice_reconcile.py::test_report_is_permutation_invariant` |
 | TRAP-54 | 单笔推理与合并调用的结果一致 | `src/peakledger/penalty_logit/service.py` | `tests/test_penalty_logit.py::test_score_is_batch_invariant` |
+| TRAP-61 | 换档两档任一不满足复核条件即不占席位 | `src/peakledger/engine.py` | `tests/test_pending_gears.py::test_any_gear_failing_review_gives_up_the_seat` |
+| TRAP-62 | 两档名单不同时改锁 maximin 名单，整数分不受舍入影响 | `src/peakledger/review_exposure/confirmation.py` | `tests/test_pending_gears.py::test_roster_is_maximin_when_gears_disagree` |
+| TRAP-63 | 快照日后入账的档位不改变当班名单 | `src/peakledger/charge_notices/service.py` | `tests/test_pending_gears.py::test_late_gear_records_do_not_change_the_roster` |

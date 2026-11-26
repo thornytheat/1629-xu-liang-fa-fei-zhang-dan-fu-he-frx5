@@ -1,6 +1,6 @@
 # 服务接口
 
-`GET /api/plan?capacity=16` 返回默认快照下的完整方案。`POST /api/plan` 支持提交本地记录，`packet` 内仅含 `observations` 和 `outcomes` 列表。
+`GET /api/plan?capacity=16` 返回默认快照下的完整方案。`POST /api/plan` 支持提交本地记录，`packet` 内含 `observations`、`outcomes` 两份必需列表，以及可选的 `coefficients` 列表（见 [业务规格](SPEC.md#换档待确认系数)）。
 
 `GET /api/summary` 返回简读版。`GET /api/decisions/<case_id>` 回读对应测量与标准化特征。`GET /api/compare?capacity=16&against=0` 显示两档额度的逐单状态变更。
 

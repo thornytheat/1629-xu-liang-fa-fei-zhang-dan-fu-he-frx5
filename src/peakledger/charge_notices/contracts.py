@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass(frozen=True)
@@ -21,6 +21,21 @@ class Outcome:
 
 
 @dataclass(frozen=True)
+class Coefficient:
+    """换档后某计量组待确认的互感器校验系数。
+
+    同一组最多保留两个可见值；整组最终只会采用其中一档。
+    """
+
+    case_id: str
+    group: str
+    coefficient: float
+    day: int
+    revision: int
+    arrived: int
+
+
+@dataclass(frozen=True)
 class Rejection:
     code: str
     stream: str
@@ -35,3 +50,4 @@ class Intake:
     outcomes: tuple[Outcome, ...]
     rejections: tuple[Rejection, ...]
     source_counts: dict[str, int]
+    coefficients: tuple[Coefficient, ...] = field(default_factory=tuple)

@@ -90,3 +90,31 @@ def test_explicit_plan_and_generation_guard_round_trip(handler, original):
         ).status_code
         == 409
     )
+
+
+def test_gear_packet_round_trips_through_plan_and_release(handler, original):
+    packet = {
+        **original,
+        "coefficients": [
+            {"case_id": "G1", "group": "商业综合体", "day": 143, "arrived": 143,
+             "revision": 1, "coefficient": 0.7},
+            {"case_id": "G2", "group": "商业综合体", "day": 143, "arrived": 143,
+             "revision": 1, "coefficient": 0.85},
+        ],
+    }
+    command = {"packet": packet, "capacity": DEFAULT_BUDGET, "as_of": DEFAULT_DAY}
+    trial = handler.post("/api/plan", json=command)
+    assert trial.status_code == 200
+    body = trial.json()
+    confirmation = body["confirmation"]
+    assert confirmation["pending"] == {"商业综合体": [0.7, 0.85]}
+    assert set(confirmation["roster"]) == {
+        row["case_id"] for row in body["decisions"] if row["status"] == "allocated"
+    }
+    assert handler.get("/api/summary").json()["confirmation"] is None
+    command.update(expected_generation=0, run_id=body["run_id"])
+    registered = handler.post("/api/releases", json=command)
+    assert registered.status_code == 201
+    archived = handler.get(f"/api/releases/{registered.json()['generation']}").json()
+    assert archived["evidence"]["confirmation"] == confirmation
+

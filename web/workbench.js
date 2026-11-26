@@ -126,6 +126,18 @@ function replayEvidence() {
     const status = ({ STABLE: '参考稳定', WATCH: '持续观察', REGIME_CHANGED: '暂停自动', LOW_SUPPORT: '样本不足', NO_BATCH: '空组' })[meta.status];
     ui.regimes.append(node('li', `${name} · ${status}`, {'data-status': meta.status}));
   }
+  const confirmation = state.data.confirmation;
+  if (confirmation) {
+    const label = confirmation.agreed ? '两档名单一致' : '两档分歧，按下限锁定';
+    const totals = (confirmation.totals_cents || [])
+      .map(value => number(value / 100))
+      .join(' / ');
+    ui.regimes.append(node('li', `换档两档 · ${label} · 下限 ${number(confirmation.critical_cents / 100)} 元`, {'data-status': confirmation.agreed ? 'STABLE' : 'WATCH'}));
+    Object.entries(confirmation.pending || {}).forEach(([group, options]) => {
+      ui.regimes.append(node('li', `${group} · 待确认两档 ${options.join(' / ')}`));
+    });
+    if (totals) ui.regimes.append(node('li', `两档预期争议罚费 ${totals} 元`));
+  }
 }
 
 function sceneEvidence() {

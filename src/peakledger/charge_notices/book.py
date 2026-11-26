@@ -4,7 +4,7 @@ from pathlib import Path
 import re
 
 from ..settings import FIELD_BOUNDS, GROUPS, REPORT_LAG, TARGET
-from .contracts import Observation, Outcome
+from .contracts import Coefficient, Observation, Outcome
 
 
 CASE_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,43}\Z")
@@ -77,6 +77,21 @@ def observation(row: dict) -> Observation:
                 raise ValueError(f"{field} 只接收 0 或 1")
         reported[field] = value
     return Observation(case_id, row["group"], day, arrived, revision, clock, reported)
+
+
+def coefficient(row: dict) -> Coefficient:
+    """解析换档后待确认的互感器校验系数记录。"""
+    case_id = identity(row)
+    day = integer(row.get("day"), 1, 36_500, "发生日")
+    arrived = integer(row.get("arrived"), day, 36_500, "入账日")
+    revision = integer(row.get("revision"), 1, 10_000, "修订号")
+    if not isinstance(row.get("group"), str) or row["group"] not in GROUPS:
+        raise ValueError("业务分组不在档案内")
+    low, high = FIELD_BOUNDS["multiplicity"]
+    value = number(row.get("coefficient"), "待确认系数")
+    if not low <= value <= high:
+        raise ValueError(f"待确认系数超出设备计量范围 [{low}, {high}]")
+    return Coefficient(case_id, row["group"], value, day, revision, arrived)
 
 
 def outcome(row: dict) -> Outcome:

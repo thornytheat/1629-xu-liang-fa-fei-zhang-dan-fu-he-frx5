@@ -8,7 +8,16 @@ from .roster import build_schedule, handover_notes
 
 
 def compile_delivery(
-    *, snapshot, plan, intake, assessment, drift, model, signals, details
+    *,
+    snapshot,
+    plan,
+    intake,
+    assessment,
+    drift,
+    model,
+    signals,
+    details,
+    confirmation=None,
 ):
     verify(plan)
     states, causes, groups = counts(plan)
@@ -66,6 +75,8 @@ def compile_delivery(
     body["handover"] = handover_notes(
         {"summary": body["summary"], "plan": plan}, schedule
     )
+    if confirmation is not None:
+        body["confirmation"] = confirmation
     checksum = digest(body)
     body["run_id"] = checksum
     return Delivery(checksum, snapshot, len(plan.decisions), plan.used, body)
@@ -78,5 +89,9 @@ def evidence(report: dict, step: str):
         "model": report["model"],
         "replay": report["evaluation"],
         "shift": report["drift"],
-        "resources": {"used": report["resource"], "summary": report["summary"]},
+        "resources": {
+            "used": report["resource"],
+            "summary": report["summary"],
+            "confirmation": report.get("confirmation"),
+        },
     }[step]

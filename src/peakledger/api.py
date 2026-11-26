@@ -43,6 +43,7 @@ class Feed(BaseModel):
     model_config = ConfigDict(extra="forbid")
     observations: list = Field(max_length=2500)
     outcomes: list = Field(max_length=2500)
+    coefficients: list = Field(default_factory=list, max_length=2500)
 
 
 class PlanInput(BaseModel):
@@ -79,9 +80,11 @@ def compute(command: PlanInput):
     try:
         if command.packet is None:
             return sample_plan(command.capacity, command.as_of)
-        return plan(
-            command.packet.model_dump(), as_of=command.as_of, capacity=command.capacity
-        )
+        packet = command.packet.model_dump()
+        if not packet.get("coefficients"):
+            # 没有档位记录时保持与既有批次完全一致的取证口径。
+            packet.pop("coefficients", None)
+        return plan(packet, as_of=command.as_of, capacity=command.capacity)
     except ValueError as exc:
         raise HTTPException(422, str(exc)) from exc
 
@@ -123,6 +126,7 @@ def summary(capacity: Capacity = DEFAULT_BUDGET):
         "metric": report["evaluation"]["metric"],
         "holdout": report["evaluation"]["holdout_cases"],
         "report": report["summary"],
+        "confirmation": report.get("confirmation"),
         "first_allocations": [
             row for row in report["decisions"] if row["status"] == "allocated"
         ][:5],

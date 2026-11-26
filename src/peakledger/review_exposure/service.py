@@ -17,23 +17,29 @@ def quota(value: int) -> int:
     return value
 
 
-def allocate(pairs, capacity: int, snapshot=None) -> Allocation:
-    return allocate_requests(
-        [
-            project_request(
-                card,
-                gate,
-                snapshot + 1 + (card.signal.record.day - snapshot + 11) // 3
-                if snapshot is not None
-                else None,
-            )
-            for card, gate in pairs
-        ],
-        capacity,
-    )
+def project_requests(pairs, snapshot=None):
+    return [
+        project_request(
+            card,
+            gate,
+            snapshot + 1 + (card.signal.record.day - snapshot + 11) // 3
+            if snapshot is not None
+            else None,
+        )
+        for card, gate in pairs
+    ]
 
 
-def allocate_requests(requests, capacity: int) -> Allocation:
+def allocate(pairs, capacity: int, snapshot=None, roster=None) -> Allocation:
+    return allocate_requests(project_requests(pairs, snapshot), capacity, roster=roster)
+
+
+def allocate_requests(requests, capacity: int, roster=None) -> Allocation:
+    """分派席位。
+
+    ``roster`` 给定时（两档换档的稳健名单）只发行其中候选，其余候选按
+    现有额度给出未排原因；否则沿用现有优先级背包。
+    """
     capacity = quota(capacity)
     if len({row.case_id for row in requests}) != len(requests):
         raise ValueError("分派队列存在重复单据")
@@ -48,7 +54,13 @@ def allocate_requests(requests, capacity: int) -> Allocation:
         ),
     )
     candidates = [row for row in ordered if row.status == "candidate"]
-    issued, decisions = reservations(candidates, capacity, resource_limit(capacity))
+    if roster is None:
+        issued, decisions = reservations(candidates, capacity, resource_limit(capacity))
+    else:
+        # 稳健名单只发行当班确实是候选且通过各档复核条件的账单。
+        eligible = {row.case_id for row in candidates}
+        issued = set(roster) & eligible
+        decisions = _shortfall(candidates, issued, capacity)
     rows = []
     used = Counter()
     for row in ordered:
@@ -63,6 +75,18 @@ def allocate_requests(requests, capacity: int) -> Allocation:
     return Allocation(
         capacity, sum(used.values()), dict(sorted(used.items())), tuple(rows)
     )
+
+
+def _shortfall(candidates, roster, capacity):
+    issued = set(roster)
+    ceiling = resource_limit(capacity)
+    return {
+        row.case_id: "RESOURCE_CEILING"
+        if row.units > ceiling
+        else "PORTFOLIO_CAPACITY"
+        for row in candidates
+        if row.case_id not in issued
+    }
 
 
 def review_capacity(plan: Allocation):
